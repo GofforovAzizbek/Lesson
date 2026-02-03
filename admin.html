@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel</title>
+    
+    <!-- <style>
+        body {
+            font-family: Inter, Arial;
+            background: #f2f2f2;
+        }
+        
+        .box {
+            max-width: 500px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        
+        input, textarea, button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        button {
+            background: #ffd600;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style> -->
+</head>
+<body>
+    
+    <div class="box">
+        <h1>Admin paneli</h1>
+        <input id="title" placeholder="Product nomi"><br><br>
+        <input id="price" type="number" placeholder="Narxi ($)"><br><br>
+        <input id="image" placeholder="Rasm URL"><br><br>
+        <textarea id="desc" placeholder="Tavsif"></textarea><br><br>
+        
+        <button onclick="addProduct()">Qo‘shish</button>
+    </div>
+    
+    <script>
+        function addProduct() {
+            const title = document.getElementById("title").value;
+            const price = document.getElementById("price").value;
+            const image = document.getElementById("image").value;
+            const desc = document.getElementById("desc").value;
+            
+            if (!title || !price || !image) {
+                alert("Barcha maydonlarni to‘ldir");
+                return;
+            }
+            
+            const newProduct = {
+                id: Date.now(), 
+                title,
+                price,
+                thumbnail: image,
+                description: desc
+            };
+            
+            const products = JSON.parse(localStorage.getItem("products")) || [];
+            products.push(newProduct);
+            localStorage.setItem("products", JSON.stringify(products));
+            
+            alert("Product qo‘shildi");
+            document.querySelectorAll("input, textarea").forEach(i => i.value = "");
+        }
+    </script>
+    
+</body>
+</html>
