@@ -1,55 +1,173 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html>
+
 <head>
     <meta charset="UTF-8">
-    <title>Admin paneli</title>
+    <title>Admin</title>
+    <style>
+        body {
+            font-family: Inter;
+            background: #eee
+        }
+
+        .box {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 20px
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px
+        }
+
+        .item {
+            border: 1px solid #ddd;
+            padding: 8px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between
+        }
+
+        img {
+            width: 50px
+        }
+    </style>
 </head>
+
 <body>
-    
+
     <div class="box">
-        <h1>Admin paneli</h1>
-        <input id="title" placeholder="Product nomi"><br><br>
-        <input id="price" type="number" placeholder="Narxi ($)"><br><br>
-        <input id="image" type="file" accept="image/*"><br><br>
-        <textarea id="desc" placeholder="Tavsif"></textarea><br><br>
-        
-        <button onclick="addProduct()">Qo‘shish</button>
+        <h2>Admin panel</h2>
+
+        <input id="title" placeholder="Title">
+        <input id="brand" placeholder="Brand">
+        <input id="price" type="number" placeholder="Price">
+        <textarea id="desc" placeholder="Description"></textarea>
+        <input id="img" type="file">
+
+        <button id="btn">ADD</button>
+        <hr>
+        <div id="list"></div>
     </div>
-    
+
     <script>
-        function addProduct() {
-            const title = document.getElementById("title").value;
-            const price = document.getElementById("price").value;
-            const imageFile = document.getElementById("image").files[0];
-            const desc = document.getElementById("desc").value;
-            
-            if (!title || !price || !imageFile) {
-                alert("Barcha maydonlarni to‘ldir");
+        const list = document.getElementById("list");
+        const btn = document.getElementById("btn");
+        const title = document.getElementById("title");
+        const brand = document.getElementById("brand");
+        const price = document.getElementById("price");
+        const desc = document.getElementById("desc");
+        const img = document.getElementById("img");
+
+        let products = [];
+        let editId = null;
+
+        fetch("https://dummyjson.com/products?limit=10")
+            .then(r => r.json())
+            .then(d => {
+                products = d.products;
+                loadLocal();
+            });
+
+        function loadLocal() {
+            const local = JSON.parse(localStorage.getItem("products")) || [];
+            products = [...products, ...local];
+            render();
+        }
+
+        function render() {
+            list.innerHTML = "";
+            products.forEach(p => {
+                const canEdit = p.id > 1000 || p.id < 1000;
+                list.innerHTML += `
+<div class="item">
+<div><img src="${p.thumbnail}"> ${p.title}</div>
+<div>
+<button onclick="edit(${p.id})">✏️</button>
+<button onclick="del(${p.id})">❌</button>
+</div>
+</div>`;
+            });
+        }
+
+        function store() {
+            const localOnly = products.filter(p => p.id > 1000);
+            localStorage.setItem("products", JSON.stringify(localOnly));
+            render();
+        }
+
+        function clear() {
+            title.value = "";
+            brand.value = "";
+            price.value = "";
+            desc.value = "";
+            img.value = "";
+        }
+
+        function save() {
+            if (!img.files[0]) {
+                alert("Select an image!");
                 return;
             }
-            
+            if (products.find(p => p.title.toLowerCase() === title.value.toLowerCase() && p.id > 1000)) {
+                alert("Duplicate product!");
+                return;
+            }
+
             const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                
-                const newProduct = {
+            reader.onload = e => {
+                products.unshift({
                     id: Date.now(),
-                    title,
-                    price,
-                    thumbnail: e.target.result, 
-                    description: desc
-                };
-                
-                const products = JSON.parse(localStorage.getItem("products")) || [];
-                products.push(newProduct);
-                localStorage.setItem("products", JSON.stringify(products));
-                
-                alert("Product qo‘shildi");
-                document.querySelectorAll("input, textarea").forEach(i => i.value = "");
+                    title: title.value,
+                    brand: brand.value,
+                    price: price.value,
+                    description: desc.value,
+                    thumbnail: e.target.result
+                });
+                store();
+                clear();
             };
-            
-            reader.readAsDataURL(imageFile);
+            reader.readAsDataURL(img.files[0]);
         }
+
+        function del(id) {
+            products = products.filter(p => p.id != id);
+            store();
+        }
+
+        function edit(id) {
+            const p = products.find(x => x.id == id);
+            if (!p) return;
+            title.value = p.title;
+            brand.value = p.brand || "";
+            price.value = p.price || "";
+            desc.value = p.description || "";
+            editId = id;
+            btn.innerText = "UPDATE";
+        }
+
+        function update() {
+            const i = products.findIndex(p => p.id == editId);
+            if (i == -1) return;
+            products[i] = {
+                ...products[i],
+                title: title.value,
+                brand: brand.value,
+                price: price.value,
+                description: desc.value
+            };
+            editId = null;
+            btn.innerText = "ADD";
+            store();
+            clear();
+        }
+
+        btn.onclick = () => editId ? update() : save();
     </script>
 </body>
+
 </html>
