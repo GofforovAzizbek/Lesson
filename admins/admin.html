@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Panel</title>
+
+    <style>
+      body {
+        font-family: Arial;
+        background: #f5f7fa;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1200px;
+        margin: auto;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+      }
+      .form,
+      .list {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        margin-bottom: 8px;
+        padding: 6px;
+      }
+      button {
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+      .card {
+        display: flex;
+        gap: 10px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+      }
+      .card img {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Admin Panel</h1>
+
+      <div class="grid">
+        <!-- FORM -->
+        <div class="form">
+          <h3>Add / Edit Product</h3>
+          <input id="id" hidden />
+
+          <input id="title" placeholder="Title" />
+          <textarea id="description" placeholder="Description"></textarea>
+          <input id="price" placeholder="Price" />
+          <input id="discount" placeholder="Discount %" />
+          <input id="rating" placeholder="Rating" />
+          <input id="stock" placeholder="Stock" />
+          <input id="brand" placeholder="Brand" />
+          <input id="category" placeholder="Category" />
+          <input id="thumbnail" placeholder="Thumbnail URL" />
+          <input id="images" placeholder="Images URL (comma separated)" />
+
+          <button onclick="saveProduct()">💾 Save</button>
+        </div>
+
+        <!-- LIST -->
+        <div class="list">
+          <h3>Products</h3>
+          <div id="products"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../admins/admin.html"></script>
+  </body>
+</html>
